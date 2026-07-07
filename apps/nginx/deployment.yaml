@@ -18,18 +18,22 @@ spec:
       labels:
         app: nginx
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
       - name: host-vol
-        hostPath:
-          path: /etc
+        emptyDir: {}
       containers:
       - name: nginx
         image: nginx:latest
         ports:
         - containerPort: 80
-          hostPort: 80
         securityContext:
-          privileged: true
+          privileged: false
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
           capabilities:
-            add:
-            - SYS_ADMIN
+            drop:
+            - ALL
