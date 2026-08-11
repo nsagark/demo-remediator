@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v2beta1
+kind: PolicyException
+metadata:
+  labels:
+    cleanup.kyverno.io/ttl: 2026-08-18T184508Z
+  name: policy-exc-req-h4798d4508h-0
+  namespace: kyverno
+spec:
+  exceptions:
+  - policyName: disallow-privilege-escalation
+    ruleNames:
+    - '*'
+    - autogen-*
+  - policyName: require-run-as-nonroot
+    ruleNames:
+    - '*'
+    - autogen-*
+  - policyName: restrict-seccomp-strict
+    ruleNames:
+    - '*'
+    - autogen-*
+  - policyName: disallow-capabilities-strict
+    ruleNames:
+    - '*'
+    - autogen-*
+  match:
+    any: []
