@@ -92,3 +92,223 @@ spec:
         securityContext:
           privileged: false
           allowPrivilegeEscalation: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-dev
+  labels:
+    app: nginx
+    environment: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        environment: dev
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 8080
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test
+  labels:
+    app: nginx
+    environment: test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        environment: test
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-qa
+  labels:
+    app: nginx
+    environment: qa
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        environment: qa
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 8080
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+      - name: logger
+        image: alpine:3.20
+        command: ["sh", "-c", "while true; do date >> /logs/access.log; sleep 30; done"]
+        volumeMounts:
+        - name: logs
+          mountPath: /logs
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-uat
+  labels:
+    app: nginx
+    environment: uat
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        environment: uat
+    spec:
+      initContainers:
+      - name: init-config
+        image: alpine:3.20
+        command:
+        - sh
+        - -c
+        - |
+          mkdir -p /config
+          echo "server { listen 8080; location / { root /usr/share/nginx/html; } }" > /config/nginx.conf
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config
+          mountPath: /etc/nginx/conf.d
+          readOnly: true
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: config
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-preprod
+  labels:
+    app: nginx
+    environment: preprod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        environment: preprod
+    spec:
+      initContainers:
+      - name: health-check
+        image: curl:latest
+        command: ["sh", "-c", "echo 'Preprod health check init'"]
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+      - name: monitor
+        image: alpine:3.20
+        command: ["sh", "-c", "while true; do echo 'monitoring'; sleep 60; done"]
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
