@@ -1,0 +1,31 @@
+---
+apiVersion: "kyverno.io/v2beta1"
+kind: "PolicyException"
+metadata:
+  labels:
+    cleanup.kyverno.io/ttl: "24h"
+  name: "polex-20260818-114731-0"
+  namespace: "kyverno"
+spec:
+  exceptions:
+  - policyName: "require-run-as-nonroot"
+    ruleNames:
+    - "run-as-non-root"
+    - "autogen-run-as-non-root"
+  match:
+    any:
+    - resources:
+        kinds:
+        - "Deployment"
+        names:
+        - "nginx"
+        namespaces:
+        - "dev"
+    - resources:
+        kinds:
+        - "ReplicaSet"
+        - "Pod"
+        names:
+        - "nginx-*"
+        namespaces:
+        - "dev"
