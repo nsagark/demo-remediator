@@ -16,10 +16,12 @@ spec:
       labels:
         app: nginx-rc3-anthropic
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: host-etc
-          hostPath:
-            path: /etc
+          emptyDir: {}
       containers:
         - name: nginx
           image: nginx:latest
@@ -28,6 +30,8 @@ spec:
           securityContext:
             privileged: true
             allowPrivilegeEscalation: true
+            seccompProfile:
+              type: RuntimeDefault
             runAsUser: 0
             capabilities:
               add:
