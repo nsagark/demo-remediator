@@ -18,21 +18,22 @@ spec:
     spec:
       volumes:
         - name: host-etc
-          hostPath:
-            path: /etc
+          emptyDir: {}
       containers:
         - name: nginx
           image: nginx:latest
           ports:
             - containerPort: 80
           securityContext:
-            privileged: true
-            allowPrivilegeEscalation: true
-            runAsUser: 0
+            privileged: false
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
             capabilities:
-              add:
-                - SYS_ADMIN
-                - NET_RAW
+              drop:
+                - ALL
           volumeMounts:
             - name: host-etc
               mountPath: /host-etc
