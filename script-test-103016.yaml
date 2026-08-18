@@ -1,0 +1,23 @@
+---
+apiVersion: "kyverno.io/v2beta1"
+kind: "PolicyException"
+metadata:
+  labels:
+    cleanup.kyverno.io/ttl: "2026-08-19T143032Z"
+  name: "script-test-103016-0"
+  namespace: "kyverno"
+spec:
+  exceptions:
+  - policyName: "require-run-as-nonroot"
+    ruleNames:
+    - "run-as-non-root"
+    - "autogen-run-as-non-root"
+  match:
+    any:
+    - resources:
+        kinds:
+        - "Deployment"
+        names:
+        - "nginx"
+        namespaces:
+        - "dev"
