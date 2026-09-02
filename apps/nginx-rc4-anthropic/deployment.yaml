@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rc4-anthropic
+  namespace: default
+  labels:
+    app: nginx-rc4-anthropic
+    test: v0-2-9-rc-4-anthropic-provider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-rc4-anthropic
+  template:
+    metadata:
+      labels:
+        app: nginx-rc4-anthropic
+    spec:
+      volumes:
+        - name: host-etc
+          hostPath:
+            path: /etc
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            runAsUser: 0
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - NET_RAW
+          volumeMounts:
+            - name: host-etc
+              mountPath: /host-etc
