@@ -16,10 +16,12 @@ spec:
       labels:
         app: nginx-rc4-anthropic
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: host-etc
-          hostPath:
-            path: /etc
+          emptyDir: {}
       containers:
         - name: nginx
           image: nginx:latest
@@ -29,6 +31,8 @@ spec:
             privileged: true
             allowPrivilegeEscalation: true
             runAsUser: 0
+            seccompProfile:
+              type: RuntimeDefault
             capabilities:
               add:
                 - SYS_ADMIN
