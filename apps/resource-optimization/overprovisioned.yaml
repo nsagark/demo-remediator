@@ -3,18 +3,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: overprovisioned
   name: overprovisioned
   namespace: ro-demo
-  labels: {app: overprovisioned}
 spec:
   replicas: 1
-  selector: {matchLabels: {app: overprovisioned}}
+  selector:
+    matchLabels:
+      app: overprovisioned
   template:
-    metadata: {labels: {app: overprovisioned}}
+    metadata:
+      labels:
+        app: overprovisioned
     spec:
       containers:
-      - name: app
-        image: registry.k8s.io/pause:3.10
-        resources:
-          requests: {cpu: "2", memory: 1Gi}
-          limits: {cpu: "2", memory: 1Gi}
+        - image: registry.k8s.io/pause:3.10
+          name: app
+          resources:
+            limits:
+              cpu: "2"
+              memory: 1Gi
+            requests:
+              cpu: "2"
+              memory: 1Gi

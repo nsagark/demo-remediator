@@ -3,18 +3,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: underprovisioned
   name: underprovisioned
   namespace: ro-demo
-  labels: {app: underprovisioned}
 spec:
   replicas: 1
-  selector: {matchLabels: {app: underprovisioned}}
+  selector:
+    matchLabels:
+      app: underprovisioned
   template:
-    metadata: {labels: {app: underprovisioned}}
+    metadata:
+      labels:
+        app: underprovisioned
     spec:
       containers:
-      - name: app
-        image: nginx:1.27-alpine
-        resources:
-          requests: {cpu: 1m, memory: 8Mi}
-          limits: {cpu: 500m, memory: 256Mi}
+        - image: nginx:1.27-alpine
+          name: app
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 1m
+              memory: 8Mi

@@ -2,18 +2,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: rightsized
   name: rightsized
   namespace: ro-demo
-  labels: {app: rightsized}
 spec:
   replicas: 1
-  selector: {matchLabels: {app: rightsized}}
+  selector:
+    matchLabels:
+      app: rightsized
   template:
-    metadata: {labels: {app: rightsized}}
+    metadata:
+      labels:
+        app: rightsized
     spec:
       containers:
-      - name: app
-        image: nginx:1.27-alpine
-        resources:
-          requests: {cpu: 15m, memory: 100Mi}
-          limits: {cpu: 200m, memory: 256Mi}
+        - image: nginx:1.27-alpine
+          name: app
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 15m
+              memory: 100Mi
