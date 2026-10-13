@@ -1,0 +1,20 @@
+# Requests below the VPA lower bound (recommender floor is 15m CPU / 100Mi memory).
+# Expect vpa-cpu-alignment-check / vpa-memory-alignment-check: under-provisioning.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: underprovisioned
+  namespace: ro-demo
+  labels: {app: underprovisioned}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: underprovisioned}}
+  template:
+    metadata: {labels: {app: underprovisioned}}
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.27-alpine
+        resources:
+          requests: {cpu: 1m, memory: 8Mi}
+          limits: {cpu: 500m, memory: 256Mi}
