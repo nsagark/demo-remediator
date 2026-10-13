@@ -15,6 +15,3 @@ spec:
       containers:
       - name: app
         image: nginx:1.27-alpine
-        resources:
-          requests: {cpu: 1m, memory: 8Mi}
-          limits: {cpu: 500m, memory: 256Mi}
