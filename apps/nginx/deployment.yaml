@@ -33,3 +33,4 @@ spec:
           capabilities:
             add:
             - SYS_ADMIN
+          allowPrivilegeEscalation: false
